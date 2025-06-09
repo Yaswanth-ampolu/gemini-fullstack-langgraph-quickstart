@@ -163,6 +163,17 @@ The frontend features a professional, modern chatbot interface:
 - **Copy Functionality** - Easy copying of AI responses
 - **Provider Selection** - Switch between different AI providers seamlessly
 
+## 🔍 Web Research Agent Flow
+
+![Agent Flow](./app.png)
+
+This diagram shows the chatbot's intelligent web research flow:  
+1. Understands the query and generates relevant searches  
+2. Gathers and analyzes web content to identify key facts  
+3. Iteratively refines results for accuracy and depth  
+4. Synthesizes everything into a clear, cited response
+
+
 ## Deployment
 
 **Docker Deployment:**
