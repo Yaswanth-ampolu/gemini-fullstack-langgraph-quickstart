@@ -168,7 +168,7 @@ def reflection(state: OverallState, config: RunnableConfig) -> ReflectionState:
     formatted_prompt = reflection_instructions.format(
         current_date=current_date,
         research_topic=get_research_topic(state["messages"]),
-        summaries="\n\n---\n\n".join(state["web_research_result"]),
+        current_summary="\n".join(state["web_research_result"]),
     )
     # Generate the reflection
     reflection_result = structured_reflection_llm.invoke(formatted_prompt)
@@ -235,7 +235,7 @@ def finalize_answer(state: OverallState, config: RunnableConfig):
     formatted_prompt = answer_instructions.format(
         current_date=current_date,
         research_topic=get_research_topic(state["messages"]),
-        summaries="\n\n---\n\n".join(state["web_research_result"]),
+        current_summary="\n".join(state["web_research_result"]),
     )
 
     # Generate the final answer
@@ -275,7 +275,3 @@ def create_agent() -> StateGraph:
     workflow.add_edge("finalize_answer", END)
 
     return workflow.compile()
-
-
-# Create and export the graph instance
-graph = create_agent()

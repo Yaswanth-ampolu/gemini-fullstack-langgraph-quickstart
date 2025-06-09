@@ -1,14 +1,12 @@
 # mypy: disable - error - code = "no-untyped-def,misc"
 import pathlib
 import os
-import aiohttp
-import asyncio
 from fastapi import FastAPI, Request, Response
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import JSONResponse
 import fastapi.exceptions
 from typing import Dict, List, Any
-from agent.models import get_supported_models
+from agent.models import get_supported_models, check_provider_availability
 
 # Define the FastAPI app
 app = FastAPI()
@@ -21,28 +19,14 @@ async def get_available_providers() -> List[Dict[str, Any]]:
     """
     available_providers = []
     supported_models = get_supported_models()
+    provider_availability = check_provider_availability()
 
-    # Check Gemini availability
-    if os.getenv("GEMINI_API_KEY"):
-        available_providers.append({
-            "provider": "gemini",
-            "models": supported_models.get("gemini", [])
-        })
-
-    # Check if Ollama is available by trying to connect to it
-    ollama_base_url = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
-    try:
-        timeout = aiohttp.ClientTimeout(total=5)
-        async with aiohttp.ClientSession(timeout=timeout) as session:
-            async with session.get(f"{ollama_base_url}/api/tags") as response:
-                if response.status == 200:
-                    available_providers.append({
-                        "provider": "ollama",
-                        "models": supported_models.get("ollama", [])
-                    })
-    except (aiohttp.ClientError, asyncio.TimeoutError):
-        # Ollama is not accessible, skip it
-        pass
+    for provider, is_available in provider_availability.items():
+        if is_available:
+            available_providers.append({
+                "provider": provider,
+                "models": supported_models.get(provider, [])
+            })
 
     return available_providers
 
