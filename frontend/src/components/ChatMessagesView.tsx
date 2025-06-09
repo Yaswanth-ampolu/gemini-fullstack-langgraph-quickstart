@@ -7,10 +7,19 @@ import { useState, ReactNode } from "react";
 import ReactMarkdown from "react-markdown";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
+import { ImageGallery } from "@/components/ImageGallery";
 import {
   ActivityTimeline,
   ProcessedEvent,
 } from "@/components/ActivityTimeline"; // Assuming ActivityTimeline is in the same dir or adjust path
+
+// Image data interface to match backend structure
+interface ImageData {
+  url: string;
+  title: string;
+  source: string;
+  alt: string;
+}
 
 // Markdown component props type from former ReportView
 type MdComponentProps = {
@@ -172,9 +181,10 @@ interface AiMessageBubbleProps {
   mdComponents: typeof mdComponents;
   handleCopy: (text: string, messageId: string) => void;
   copiedMessageId: string | null;
+  images?: ImageData[]; // Add images prop
 }
 
-// Modern AiMessageBubble Component with better visibility
+// Modern AiMessageBubble Component with better visibility and image gallery
 const AiMessageBubble: React.FC<AiMessageBubbleProps> = ({
   message,
   historicalActivity,
@@ -184,6 +194,7 @@ const AiMessageBubble: React.FC<AiMessageBubbleProps> = ({
   mdComponents,
   handleCopy,
   copiedMessageId,
+  images = [], // Default to empty array
 }) => {
   // Determine which activity events to show and if it's for a live loading message
   const activityForThisBubble =
@@ -203,6 +214,14 @@ const AiMessageBubble: React.FC<AiMessageBubbleProps> = ({
               isLoading={isLiveActivityForThisBubble}
             />
           </div>
+        )}
+
+        {/* Image Gallery - Show if we have images */}
+        {images && images.length > 0 && (
+          <ImageGallery 
+            images={images} 
+            searchQuery={undefined}
+          />
         )}
         
         <div className="prose prose-invert max-w-none">
@@ -252,6 +271,7 @@ interface ChatMessagesViewProps {
   onCancel: () => void;
   liveActivityEvents: ProcessedEvent[];
   historicalActivities: Record<string, ProcessedEvent[]>;
+  allImages?: ImageData[]; // Add images prop to main component
 }
 
 export function ChatMessagesView({
@@ -262,6 +282,7 @@ export function ChatMessagesView({
   onCancel,
   liveActivityEvents,
   historicalActivities,
+  allImages = [], // Default to empty array
 }: ChatMessagesViewProps) {
   const [copiedMessageId, setCopiedMessageId] = useState<string | null>(null);
 
@@ -301,6 +322,9 @@ export function ChatMessagesView({
           <div className="space-y-6 pb-6">
             {messages.map((message, index) => {
               const isLast = index === messages.length - 1;
+              // For AI messages, try to get images from the global images array
+              const messageImages = message.type === "ai" ? allImages : [];
+              
               return (
                 <div key={message.id || `msg-${index}`} className="animate-fadeInUpSmooth">
                   {message.type === "human" ? (
@@ -318,6 +342,7 @@ export function ChatMessagesView({
                       mdComponents={mdComponents}
                       handleCopy={handleCopy}
                       copiedMessageId={copiedMessageId}
+                      images={messageImages}
                     />
                   )}
                 </div>
@@ -334,11 +359,18 @@ export function ChatMessagesView({
                   </div>
                   <div className="bg-gray-800/90 backdrop-blur-sm rounded-2xl rounded-bl-md p-5 border border-gray-700/50 w-full max-w-2xl shadow-xl">
                     {liveActivityEvents.length > 0 ? (
-                      <div className="text-sm">
+                      <div className="text-sm space-y-4">
                         <ActivityTimeline
                           processedEvents={liveActivityEvents}
                           isLoading={true}
                         />
+                        {/* Show images during loading if available */}
+                        {allImages && allImages.length > 0 && (
+                          <ImageGallery 
+                            images={allImages} 
+                            searchQuery="Research in progress..."
+                          />
+                        )}
                       </div>
                     ) : (
                       <div className="flex items-center space-x-3">

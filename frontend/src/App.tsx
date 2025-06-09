@@ -6,6 +6,14 @@ import { WelcomeScreen } from "@/components/WelcomeScreen";
 import { ChatMessagesView } from "@/components/ChatMessagesView";
 import { useLlmContext } from "@/contexts/LlmContext";
 
+// Image data interface to match backend structure
+interface ImageData {
+  url: string;
+  title: string;
+  source: string;
+  alt: string;
+}
+
 export default function App() {
   const { provider, model } = useLlmContext();
   const [processedEventsTimeline, setProcessedEventsTimeline] = useState<
@@ -14,6 +22,7 @@ export default function App() {
   const [historicalActivities, setHistoricalActivities] = useState<
     Record<string, ProcessedEvent[]>
   >({});
+  const [allImages, setAllImages] = useState<ImageData[]>([]); // State for collecting images
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const hasFinalizeEventOccurredRef = useRef(false);
 
@@ -52,17 +61,36 @@ export default function App() {
           };
         } else if (event?.web_research) {
           const sources = event.web_research.sources_gathered || [];
+          const images = event.web_research.images || []; // Extract images from web research
           const numSources = sources.length;
           const uniqueLabels = [
             ...new Set(sources.map((s: any) => s?.label).filter(Boolean)),
           ];
           const exampleLabels = uniqueLabels.slice(0, 3).join(", ");
-          processedEvent = {
-            title: "Web Research",
-            data: `Gathered ${numSources} sources. Related to: ${
-              exampleLabels || "N/A"
-            }.`,
-          };
+          
+          // Add new images to the collection
+          if (images.length > 0) {
+            setAllImages(prevImages => {
+              // Filter out duplicates based on URL
+              const existingUrls = new Set(prevImages.map(img => img.url));
+              const newImages = images.filter((img: ImageData) => !existingUrls.has(img.url));
+              return [...prevImages, ...newImages];
+            });
+            
+            processedEvent = {
+              title: "Web Research",
+              data: `Gathered ${numSources} sources and ${images.length} images. Related to: ${
+                exampleLabels || "N/A"
+              }.`,
+            };
+          } else {
+            processedEvent = {
+              title: "Web Research",
+              data: `Gathered ${numSources} sources. Related to: ${
+                exampleLabels || "N/A"
+              }.`,
+            };
+          }
         } else if (event?.reflection) {
           const followUpQueries = event.reflection.follow_up_queries;
           processedEvent = {
@@ -127,6 +155,7 @@ export default function App() {
     (submittedInputValue: string, effort: string) => {
       if (!submittedInputValue.trim()) return;
       setProcessedEventsTimeline([]);
+      setAllImages([]); // Clear images for new conversation
       hasFinalizeEventOccurredRef.current = false;
 
       // convert effort to, initial_search_query_count and max_research_loops
@@ -198,6 +227,7 @@ export default function App() {
               onCancel={handleCancel}
               liveActivityEvents={processedEventsTimeline}
               historicalActivities={historicalActivities}
+              allImages={allImages} // Pass the collected images
             />
           )}
         </div>

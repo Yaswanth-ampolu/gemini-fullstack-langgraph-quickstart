@@ -92,13 +92,14 @@ async def web_research(state: WebSearchState, config: RunnableConfig) -> Overall
 
     Uses free DuckDuckGo search for all providers - no API keys required!
     This provides consistent search experience across Gemini and Ollama.
+    Also collects related images for visual gallery display.
 
     Args:
         state: Current graph state containing the search query and research loop count
         config: Configuration for the runnable, including LLM provider settings
 
     Returns:
-        Dictionary with state update, including sources_gathered, search_query, and web_research_result
+        Dictionary with state update, including sources_gathered, search_query, web_research_result, and images
     """
     configurable = Configuration.from_runnable_config(config)
     provider = state.get("provider") or configurable.provider
@@ -114,18 +115,21 @@ async def web_research(state: WebSearchState, config: RunnableConfig) -> Overall
         max_retries=2,
     )
 
-    # Perform web search with DuckDuckGo
+    # Perform web search with DuckDuckGo (including images)
     search_results = await perform_web_search_with_llm(
         search_query=state["search_query"],
         llm=llm,
         search_prompt_template=generic_web_search_instructions,
-        max_results=5
+        max_results=5,
+        include_images=True,
+        max_images=6
     )
 
     return {
         "sources_gathered": search_results["sources_gathered"],
         "search_query": [search_results["search_query"]],
         "web_research_result": [search_results["web_research_result"]],
+        "images": search_results.get("images", [])  # Add images to state
     }
 
 

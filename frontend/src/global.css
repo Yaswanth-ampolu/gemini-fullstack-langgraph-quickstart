@@ -421,6 +421,32 @@ body {
   box-shadow: 0 2px 8px rgba(139, 92, 246, 0.4);
 }
 
+/* Image Gallery Specific Styles */
+.image-gallery-modal {
+  z-index: 9999;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.image-gallery-item {
+  transition: transform 0.2s ease-in-out, border-color 0.2s ease-in-out;
+}
+
+.image-gallery-item:hover {
+  transform: scale(1.02);
+}
+
+.image-gallery-navigation {
+  z-index: 10;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+/* Prevent body scroll when modal is open */
+.modal-open {
+  overflow: hidden;
+}
+
 /* Mobile-first responsive breakpoints */
 @media (max-width: 640px) {
   .glass-enhanced {
@@ -449,5 +475,14 @@ body {
   .message-bubble-user,
   .message-bubble-ai {
     max-width: 90%;
+  }
+
+  /* Adjust image gallery for mobile */
+  .image-gallery-modal {
+    padding: 1rem;
+  }
+
+  .image-gallery-item {
+    margin: 0.25rem;
   }
 }
