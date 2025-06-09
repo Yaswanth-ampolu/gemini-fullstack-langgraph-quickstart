@@ -44,8 +44,6 @@ This project demonstrates a fullstack application using a React frontend with a 
      ```env
      GEMINI_API_KEY=your_gemini_key_here          # Optional but recommended
      OLLAMA_BASE_URL=http://localhost:11434       # For local Ollama models
-     OPENAI_API_KEY=your_openai_key_here          # Optional
-     ANTHROPIC_API_KEY=your_claude_key_here       # Optional
      ```
 
 3. **Run the application:**
@@ -121,9 +119,7 @@ This application supports multiple LLM providers for enhanced flexibility:
 |----------|--------|------------------|----------|
 | **Ollama** | `llama3.1:8b`, `llama3.2`, `qwen2.5` | ❌ No (Local) | Privacy, Free usage |
 | **Google Gemini** | `gemini-2.0-flash-exp`, `gemini-1.5-pro` | ✅ Yes | Web search, Fast responses |
-| **OpenAI** | `gpt-4o`, `gpt-4o-mini`, `gpt-3.5-turbo` | ✅ Yes | High quality, Reliable |
-| **Anthropic Claude** | `claude-3-5-sonnet`, `claude-3-5-haiku` | ✅ Yes | Reasoning, Analysis |
-| **Azure OpenAI** | `gpt-4o`, `gpt-35-turbo` | ✅ Yes | Enterprise |
+
 
 ### Ollama Setup (Recommended for Local AI)
 
