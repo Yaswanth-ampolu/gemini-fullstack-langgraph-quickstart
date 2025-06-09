@@ -86,8 +86,6 @@ Create `backend/.env` from `backend/.env.example` and add your API keys:
 # At least one provider is recommended (Ollama works without API keys)
 GEMINI_API_KEY=your_gemini_key_here          # Recommended for best web search
 OLLAMA_BASE_URL=http://localhost:11434       # For local models (free)
-OPENAI_API_KEY=your_openai_key_here          # Optional
-ANTHROPIC_API_KEY=your_claude_key_here       # Optional
 ```
 
 **3. Run Development Servers:**
