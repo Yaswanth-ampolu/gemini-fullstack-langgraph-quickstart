@@ -205,3 +205,6 @@ backend/.langgraph_api
 /tmp2/
 /tmp/
 /tmp
+
+tmp/
+tmp2/
