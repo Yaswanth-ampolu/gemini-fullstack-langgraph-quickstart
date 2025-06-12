@@ -256,7 +256,7 @@ export default function App() {
       <main className="relative flex-1 flex flex-col max-w-5xl mx-auto w-full p-4">
         {/* Content Area - Fixed Frame */}
         <div className="flex-1 flex flex-col min-h-0">
-          {thread.messages.length === 0 ? (
+          {thread.messages.length === 0 && (
             <>
               <McpServerSelector />
               <WelcomeScreen
@@ -265,7 +265,8 @@ export default function App() {
                 onCancel={handleCancel}
               />
             </>
-          ) : (
+          )}
+          {thread.messages.length > 0 && (
             <>
               {/* Consider placing McpServerSelector in a less intrusive spot for ChatView if needed */}
               {/* For now, adding it above the chat messages view for visibility during development */}
@@ -274,14 +275,15 @@ export default function App() {
               </div>
               <ChatMessagesView
                 messages={thread.messages}
-              isLoading={thread.isLoading}
-              scrollAreaRef={scrollAreaRef}
-              onSubmit={handleSubmit}
-              onCancel={handleCancel}
-              liveActivityEvents={processedEventsTimeline}
-              historicalActivities={historicalActivities}
-              allImages={allImages} // Pass the collected images
-            />
+                isLoading={thread.isLoading}
+                scrollAreaRef={scrollAreaRef}
+                onSubmit={handleSubmit}
+                onCancel={handleCancel}
+                liveActivityEvents={processedEventsTimeline}
+                historicalActivities={historicalActivities}
+                allImages={allImages} // Pass the collected images
+              />
+            </>
           )}
         </div>
       </main>

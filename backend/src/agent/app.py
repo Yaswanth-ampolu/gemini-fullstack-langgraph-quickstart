@@ -9,8 +9,8 @@ from fastapi.responses import JSONResponse
 import fastapi.exceptions
 from typing import Dict, List, Any, Optional
 from agent.models import get_supported_models
-from .mcp_registry import fetch_mcp_servers, get_mcp_server_details
-from .tools_and_schemas import McpServerInfo
+from agent.mcp_registry import fetch_mcp_servers, get_mcp_server_details # Changed
+from agent.tools_and_schemas import McpServerInfo # Changed
 
 # Define the FastAPI app
 app = FastAPI()

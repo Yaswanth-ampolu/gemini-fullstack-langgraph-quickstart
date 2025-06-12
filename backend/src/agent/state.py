@@ -7,7 +7,7 @@ from langgraph.graph import add_messages
 from typing_extensions import Annotated
 
 # Removed pydantic Field import, it's not used here.
-from .tools_and_schemas import McpServerInfo, McpToolRequest, McpToolResponse
+from agent.tools_and_schemas import McpServerInfo, McpToolRequest, McpToolResponse # Changed
 
 
 import operator

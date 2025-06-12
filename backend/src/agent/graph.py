@@ -32,7 +32,7 @@ import urllib.parse
 import json # Added
 from typing import Optional
 
-from .tools_and_schemas import McpToolRequest, McpToolResponse
+from agent.tools_and_schemas import McpToolRequest, McpToolResponse # Changed
 
 load_dotenv()
 
