@@ -109,7 +109,7 @@ export const McpServerSelector: React.FC = () => {
                            <Checkbox
                             id={`config-${key}`}
                             checked={!!currentValue}
-                            onCheckedChange={(checked) => updateServerConfigValue(key, !!checked)}
+                            onCheckedChange={(checked: boolean) => updateServerConfigValue(key, !!checked)}
                           />
                           <Label htmlFor={`config-${key}`} className="font-normal">
                             {schema.description || fieldLabel}
