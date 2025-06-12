@@ -21,3 +21,21 @@ class Reflection(BaseModel):
     follow_up_queries: List[str] = Field(
         description="A list of follow-up queries to address the knowledge gap."
     )
+
+
+class McpServerInfo(BaseModel):
+    qualified_name: str
+    display_name: str
+    description: str
+    tools: List[str]  # names of tools offered
+    config_schema: dict  # JSON schema for configuration
+
+
+class McpToolRequest(BaseModel):
+    tool_name: str
+    payload: dict
+
+
+class McpToolResponse(BaseModel):
+    status: str  # e.g., "success", "error"
+    data: dict | str

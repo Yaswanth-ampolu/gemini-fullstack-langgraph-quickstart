@@ -5,6 +5,8 @@ import { ProcessedEvent } from "@/components/ActivityTimeline";
 import { WelcomeScreen } from "@/components/WelcomeScreen";
 import { ChatMessagesView } from "@/components/ChatMessagesView";
 import { useLlmContext } from "@/contexts/LlmContext";
+import { McpServerSelector } from "@/components/McpServerSelector"; // Added
+import { useMcp } from "@/contexts/McpContext"; // Added
 
 // Image data interface to match backend structure
 interface ImageData {
@@ -16,6 +18,7 @@ interface ImageData {
 
 export default function App() {
   const { provider, model } = useLlmContext();
+  const { selectedMcpServer, mcpServerConfig } = useMcp(); // Added MCP context
   const [processedEventsTimeline, setProcessedEventsTimeline] = useState<
     ProcessedEvent[]
   >([]);
@@ -109,7 +112,23 @@ export default function App() {
             data: "Composing and presenting the final answer.",
           };
           hasFinalizeEventOccurredRef.current = true;
+        } else if (event?.execute_mcp_tool) { // Added case for MCP tool execution
+          const response = event.execute_mcp_tool.mcp_tool_response;
+          let toolData = "Executing MCP tool...";
+          if (response) {
+            toolData = `Status: ${response.status}. `;
+            if (typeof response.data === 'string') {
+              toolData += `Data: ${response.data}`;
+            } else if (typeof response.data === 'object') {
+              toolData += `Data: ${JSON.stringify(response.data, null, 2)}`;
+            }
+          }
+          processedEvent = {
+            title: `MCP Tool: ${event.execute_mcp_tool.tool_name || 'Unknown Tool'} on ${event.execute_mcp_tool.server_qname || 'Unknown Server'}`,
+            data: toolData,
+          };
         }
+
 
         if (processedEvent) {
           setProcessedEventsTimeline((prevEvents) => [
@@ -187,15 +206,40 @@ export default function App() {
           id: Date.now().toString(),
         },
       ];
-      thread.submit({
+
+      const submitPayload: any = {
         messages: newMessages,
         initial_search_query_count: initial_search_query_count,
         max_research_loops: max_research_loops,
         reasoning_model: model,
         provider: provider,
-      });
+      };
+
+      if (selectedMcpServer) {
+        submitPayload.target_mcp_server_qualified_name = selectedMcpServer.qualified_name;
+        submitPayload.active_mcp_configurations = {
+          [selectedMcpServer.qualified_name]: mcpServerConfig,
+        };
+        if (selectedMcpServer.tools && selectedMcpServer.tools.length > 0) {
+          submitPayload.current_mcp_tool_request = {
+            tool_name: selectedMcpServer.tools[0], // Use first tool as default
+            payload: { query: submittedInputValue }, // Use user input as payload
+          };
+        } else {
+          // No tools available on server, or send null if backend allows
+           submitPayload.current_mcp_tool_request = null;
+        }
+      } else {
+        // Ensure these keys are null if no MCP server is selected, so backend doesn't use stale ones if any.
+        submitPayload.target_mcp_server_qualified_name = null;
+        submitPayload.active_mcp_configurations = {};
+        submitPayload.current_mcp_tool_request = null;
+      }
+
+      console.log("Submitting payload:", submitPayload);
+      thread.submit(submitPayload);
     },
-    [thread, provider, model]
+    [thread, provider, model, selectedMcpServer, mcpServerConfig] // Added MCP state dependencies
   );
 
   const handleCancel = useCallback(() => {
@@ -213,14 +257,23 @@ export default function App() {
         {/* Content Area - Fixed Frame */}
         <div className="flex-1 flex flex-col min-h-0">
           {thread.messages.length === 0 ? (
-            <WelcomeScreen
-              handleSubmit={handleSubmit}
-              isLoading={thread.isLoading}
-              onCancel={handleCancel}
-            />
+            <>
+              <McpServerSelector />
+              <WelcomeScreen
+                handleSubmit={handleSubmit}
+                isLoading={thread.isLoading}
+                onCancel={handleCancel}
+              />
+            </>
           ) : (
-            <ChatMessagesView
-              messages={thread.messages}
+            <>
+              {/* Consider placing McpServerSelector in a less intrusive spot for ChatView if needed */}
+              {/* For now, adding it above the chat messages view for visibility during development */}
+              <div className="my-4"> {/* Added margin for spacing */}
+                <McpServerSelector />
+              </div>
+              <ChatMessagesView
+                messages={thread.messages}
               isLoading={thread.isLoading}
               scrollAreaRef={scrollAreaRef}
               onSubmit={handleSubmit}

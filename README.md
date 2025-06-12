@@ -24,6 +24,7 @@ This project demonstrates a fullstack application using a React frontend with a 
 - 📄 **Cited Answers** - Responses include proper citations from web sources
 - 🪟 **Windows Ready** - Easy setup with batch files for Windows users
 - 🔄 **Hot-Reloading** - Development-friendly with live reload for both frontend and backend
+- 🧩 **MCP Integration** - Extensible agent capabilities via Model Context Protocol servers from Smithery.ai
 
 
 
@@ -46,6 +47,7 @@ This project demonstrates a fullstack application using a React frontend with a 
      OLLAMA_BASE_URL=http://localhost:11434       # For local Ollama models
      OPENAI_API_KEY=your_openai_key_here          # Optional
      ANTHROPIC_API_KEY=your_claude_key_here       # Optional
+     SMITHERY_API_KEY=your_smithery_api_key_here  # Optional, for MCP server integration
      ```
 
 3. **Run the application:**
@@ -88,6 +90,8 @@ GEMINI_API_KEY=your_gemini_key_here          # Recommended for best web search
 OLLAMA_BASE_URL=http://localhost:11434       # For local models (free)
 OPENAI_API_KEY=your_openai_key_here          # Optional
 ANTHROPIC_API_KEY=your_claude_key_here       # Optional
+# Smithery.ai MCP Integration (Optional - for accessing MCP server registry)
+SMITHERY_API_KEY=your_smithery_api_key_here
 ```
 
 **3. Run Development Servers:**
@@ -151,6 +155,28 @@ The LangGraph agent follows this intelligent research process:
 3. **Content Analysis** - Analyzes search results and identifies knowledge gaps
 4. **Iterative Refinement** - Generates follow-up searches if more information is needed
 5. **Synthesis** - Combines all findings into a comprehensive answer with citations
+5. **MCP Tool Execution (Optional)** - If an MCP server is selected, the agent can leverage external tools provided by that server to augment its capabilities or access specialized information.
+
+## Model Context Protocol (MCP) Integration
+
+This application integrates with the Model Context Protocol (MCP) via [Smithery.ai](https://smithery.ai/), allowing the agent to connect to and utilize external tools and services.
+
+### How it Works:
+- **Discover Servers**: The application fetches a list of available MCP servers from the Smithery.ai registry.
+- **Select & Configure**: A new UI component allows you to select an MCP server from the fetched list. If the server requires configuration (as defined by its `config_schema`), you can provide these settings directly in the UI.
+- **Agent Augmentation**: When a user query is submitted and an MCP server is selected and configured, the agent can:
+    - Be routed to use a tool from the selected MCP server.
+    - The agent will make a request to the Smithery.ai proxy, which then calls the target MCP server with your configuration and tool request.
+    - The response from the MCP tool is then incorporated into the agent's context, similar to how web research results are used.
+- **Extensible Capabilities**: This allows the agent's core functionalities to be extended with specialized tools (e.g., code interpreters, database query tools, domain-specific knowledge bases) registered with Smithery.ai.
+
+### Setup:
+- To use this feature, you need a `SMITHERY_API_KEY` from Smithery.ai.
+- Add this key to your `backend/.env` file:
+  ```env
+  SMITHERY_API_KEY=your_smithery_api_key_here
+  ```
+- If the key is not provided or is invalid, the MCP server list will be empty, and the feature will be dormant.
 
 ## Modern UI Features
 

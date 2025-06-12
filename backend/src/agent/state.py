@@ -1,19 +1,27 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import TypedDict, Dict, Any
+from typing import TypedDict, Dict, Any, List, Optional
 
 from langgraph.graph import add_messages
 from typing_extensions import Annotated
 
+# Removed pydantic Field import, it's not used here.
+from .tools_and_schemas import McpServerInfo, McpToolRequest, McpToolResponse
+
 
 import operator
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field # This field is from dataclasses, not pydantic. Retained for SearchStateOutput
 from typing_extensions import Annotated
 
 
 class OverallState(TypedDict):
     messages: Annotated[list, add_messages]
+    available_mcp_servers: List[McpServerInfo]
+    active_mcp_configurations: Dict[str, dict]
+    current_mcp_tool_request: Optional[McpToolRequest]
+    target_mcp_server_qualified_name: Optional[str]
+    mcp_tool_response: Optional[McpToolResponse]
     search_query: Annotated[list, operator.add]
     web_research_result: Annotated[list, operator.add]
     sources_gathered: Annotated[list, operator.add]

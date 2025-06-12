@@ -36,6 +36,11 @@ GEMINI_API_KEY=your_gemini_api_key_here
 
 # Ollama Configuration (optional)
 OLLAMA_BASE_URL=http://localhost:11434
+
+# Smithery.ai MCP Integration (Optional)
+# Required to access and use MCP servers from the Smithery.ai registry.
+# If not provided, the MCP integration feature will be disabled (server list will be empty).
+SMITHERY_API_KEY=your_smithery_api_key_here
 ```
 
 ## Using Ollama

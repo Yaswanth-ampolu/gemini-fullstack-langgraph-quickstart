@@ -4,12 +4,15 @@ import { BrowserRouter } from "react-router-dom";
 import "./global.css";
 import App from "./App.tsx";
 import { LlmProvider } from "./contexts/LlmContext.tsx";
+import { McpProvider } from "./contexts/McpContext.tsx"; // Added McpProvider
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <BrowserRouter>
       <LlmProvider>
-        <App />
+        <McpProvider> {/* Added McpProvider */}
+          <App />
+        </McpProvider>
       </LlmProvider>
     </BrowserRouter>
   </StrictMode>
